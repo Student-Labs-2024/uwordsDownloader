@@ -11,4 +11,4 @@ SECRET_TOKEN: str = os.environ.get("SECRET_TOKEN")
 PIX_TOKEN: str = os.environ.get("PIX_TOKEN")
 
 YOUTUBE_UPLOAD_DIR = BASE_DIR / "download" / "youtube"
-IMAGE_UPLOAD_DIR = BASE_DIR / "download" / "image"
+IMAGE_UPLOAD_DIR = BASE_DIR / "download" / "images"

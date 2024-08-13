@@ -3,7 +3,7 @@ import aiohttp
 import aiofiles
 from typing import Tuple, Union
 
-from config.instance import PIX_TOKEN, IMAGE_UPLOAD_DIR
+from src.config.instance import PIX_TOKEN, IMAGE_UPLOAD_DIR
 
 
 logging.basicConfig(
@@ -54,17 +54,17 @@ async def download_pixabay_image(
         try:
             async with session.get(image_url) as response:
                 if response.status == 200:
-                    title = f"{word}.jpg"
-                    image_path = IMAGE_UPLOAD_DIR / title
+                    filename = f"{word}.jpg"
+                    image_path = IMAGE_UPLOAD_DIR / filename
 
                     async with aiofiles.open(image_path, "wb") as f:
                         content = await response.read()
                         await f.write(content)
-                    return image_path, title
+                    return image_path, filename
                 else:
                     logger.info(f"[DOWNLOAD] Error: {response.text()}")
                     return None, None
 
         except Exception as e:
             logger.info(f"[DOWNLOAD] Error: {e}")
-            return None
+            return None, None

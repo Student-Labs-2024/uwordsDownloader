@@ -2,9 +2,8 @@
 .env*
 
 # audios
-**.wav
-**.ogg
 **.mp3
+**.jpg
 
 # dirs
 .pytest_cache/

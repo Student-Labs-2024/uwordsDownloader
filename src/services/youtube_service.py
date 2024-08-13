@@ -3,7 +3,7 @@ import yt_dlp
 import logging
 from typing import Tuple, Union
 
-from config.instance import YOUTUBE_UPLOAD_DIR
+from src.config.instance import YOUTUBE_UPLOAD_DIR
 
 
 logging.basicConfig(
