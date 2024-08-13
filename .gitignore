@@ -1,0 +1,17 @@
+# environment
+.env*
+
+# audios
+**.wav
+**.ogg
+**.mp3
+
+# dirs
+.pytest_cache/
+.venv/
+venv/
+.idea/
+**/__pycache__
+
+# conf
+docker-compose.yml

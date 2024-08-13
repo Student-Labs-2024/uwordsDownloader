@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  downloader_app:
+    build: .
+    container_name: downloader_app
+    command: >
+      /bin/sh -c "uvicorn src.main:app --reload --proxy-headers --host 0.0.0.0 --port 8100 --workers 4"
+    restart: always
+    volumes:
+      - ./:/backend
+    ports:
+      - "8101:8100"
+    env_file:
+      - ./.env.dev
