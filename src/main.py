@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.fastapi_docs_config import TAGS_METADATA
+from src.config.instance import ALLOWED_ORIGINS_LIST
 
 from src.routers.pixabay_router import pixabay_router_v1
 from src.routers.youtube_router import youtube_router_v1
@@ -22,7 +23,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_ORIGINS_LIST,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

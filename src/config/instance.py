@@ -12,3 +12,6 @@ PIX_TOKEN: str = os.environ.get("PIX_TOKEN")
 
 YOUTUBE_UPLOAD_DIR = BASE_DIR / "download" / "youtube"
 IMAGE_UPLOAD_DIR = BASE_DIR / "download" / "images"
+
+ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS")
+ALLOWED_ORIGINS_LIST = ALLOWED_ORIGINS.split(",")
