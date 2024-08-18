@@ -14,13 +14,6 @@ app = FastAPI(
     openapi_tags=TAGS_METADATA,
 )
 
-origins = [
-    "http://localhost:5173",
-    "https://localhost:5173",
-    "http://localhost",
-    "http://localhost:8001",
-]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS_LIST,
