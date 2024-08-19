@@ -5,6 +5,7 @@ import logging
 from typing import Tuple, Union
 
 from src.config.instance import YOUTUBE_UPLOAD_DIR
+from src.utils.exceptions import YouTubeDownloadError
 
 
 logging.basicConfig(
@@ -19,7 +20,7 @@ logger = logging.getLogger("SERVICES YOUTUBE")
 
 async def download_youtube_audio(
     link: str,
-) -> Union[Tuple[str, str], Tuple[None, None]]:
+) -> Tuple[str, str]:
     try:
         ydl_opts = {
             "format": "bestaudio/best",
@@ -45,12 +46,12 @@ async def download_youtube_audio(
 
     except Exception as e:
         logger.info(f"[DOWNLOAD] Error: {e}")
-        return None, None
+        raise YouTubeDownloadError(f"Failed to download audio!")
 
 
 async def download_youtube_subtitles(
     link: str, lang1: str = "en", lang2: str = "ru"
-) -> Union[str, None]:
+) -> str:
     try:
         ydl_opts = {
             "writesubtitles": True,
@@ -65,7 +66,7 @@ async def download_youtube_subtitles(
             info_dict = ydl.extract_info(link, download=False)
 
             if not "subtitles" in info_dict:
-                return None
+                raise YouTubeDownloadError(f"Failed to download subtitles!")
 
             if "subtitles" in info_dict and lang1 in info_dict["subtitles"]:
                 lang = lang1
@@ -82,5 +83,5 @@ async def download_youtube_subtitles(
             return subtitle_filename
 
     except Exception as e:
-        logger.error(f"[SUBTITLES] Error: {e}")
-        return None
+        logger.info(f"[SUBTITLES] Error: {e}")
+        raise YouTubeDownloadError(f"Failed to download subtitles!")
