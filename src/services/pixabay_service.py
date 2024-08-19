@@ -1,9 +1,10 @@
 import logging
 import aiohttp
 import aiofiles
-from typing import Tuple, Union
+from typing import Tuple
 
 from src.config.instance import PIX_TOKEN, IMAGE_UPLOAD_DIR
+from src.utils.exceptions import PixabaySearchError, PixabayDownloadError
 
 
 logging.basicConfig(
@@ -13,10 +14,10 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
-logger = logging.getLogger("SERVICES IMAGE")
+logger = logging.getLogger("SERVICES PIXABAY")
 
 
-async def search_image(word: str) -> Union[str, None]:
+async def search_image(word: str) -> str:
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(
@@ -38,17 +39,14 @@ async def search_image(word: str) -> Union[str, None]:
                     return None
 
         except Exception as e:
-            logger.info(f"[SEARCH] Error: {e}")
-            return None
+            logger.error(f"[SEARCH] Error: {e}")
+            raise PixabaySearchError(f"Failed to search for image!")
 
 
 async def download_pixabay_image(
     word: str,
-) -> Union[Tuple[str, str], Tuple[None, None]]:
+) -> Tuple[str, str]:
     image_url = await search_image(word=word)
-
-    if not image_url:
-        return None, None
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -63,8 +61,8 @@ async def download_pixabay_image(
                     return image_path, filename
                 else:
                     logger.info(f"[DOWNLOAD] Error: {response.text()}")
-                    return None, None
+                    raise PixabayDownloadError(f"Failed to download image!")
 
         except Exception as e:
             logger.info(f"[DOWNLOAD] Error: {e}")
-            return None, None
+            raise PixabayDownloadError(f"Failed to download image!")
