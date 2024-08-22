@@ -2,10 +2,9 @@ import logging
 import aiohttp
 import aiofiles
 from typing import Tuple
-
-from src.config.instance import PIX_TOKEN, IMAGE_UPLOAD_DIR
+from PIL import Image
+from src.config.instance import PIX_TOKEN, IMAGE_UPLOAD_DIR, PIC_QUALITY
 from src.utils.exceptions import PixabaySearchError, PixabayDownloadError
-
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -58,6 +57,8 @@ async def download_pixabay_image(
                     async with aiofiles.open(image_path, "wb") as f:
                         content = await response.read()
                         await f.write(content)
+                    image = Image.open(image_path)
+                    image.save(image_path, quality=PIC_QUALITY, optimize=True)
                     return image_path, filename
                 else:
                     logger.info(f"[DOWNLOAD] Error: {response.text()}")
