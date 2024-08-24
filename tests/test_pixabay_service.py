@@ -1,10 +1,10 @@
 from pathlib import Path
 import aiohttp
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from src.services.pixabay_service import download_pixabay_image, search_image
 from src.utils.exceptions import PixabayDownloadError, PixabaySearchError
-from src.config.instance import IMAGE_UPLOAD_DIR, PIX_TOKEN
+from src.config.instance import IMAGE_UPLOAD_DIR, PIC_QUALITY, PIX_TOKEN
 
 
 class TestPixabayService:
@@ -69,6 +69,7 @@ class TestPixabayService:
             ("dog", 200, b"test", (Path(f"{IMAGE_UPLOAD_DIR}/dog.jpg"), "dog.jpg")),
         ],
     )
+    @patch("PIL.Image.open")
     @patch("src.services.pixabay_service.search_image")
     @patch("aiohttp.ClientSession.get")
     @patch("aiofiles.open")
@@ -76,6 +77,7 @@ class TestPixabayService:
         mock_open,
         mock_get,
         mock_search_image,
+        mock_image_open,
         word,
         status_code,
         response_read,
@@ -89,6 +91,8 @@ class TestPixabayService:
         mock_get.return_value.__aenter__.return_value = mock_response
 
         mock_open.return_value.__aenter__.return_value = AsyncMock()
+
+        mock_image_open.return_value = MagicMock()
 
         result = await download_pixabay_image(word)
         assert result == expected_result
