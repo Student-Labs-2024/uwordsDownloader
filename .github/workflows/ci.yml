@@ -34,3 +34,10 @@ jobs:
     - name: Run linters
       run: |
         python -m black ./src --check
+
+    - name: Run tests
+      env:
+        ENV: ${{ secrets.TEST_ENV }}
+      run: |
+        echo "$ENV" > .env
+        python -m pytest -p no:warnings -o log_cli=true

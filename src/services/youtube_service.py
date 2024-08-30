@@ -1,8 +1,7 @@
 import os
-import uuid
 import yt_dlp
 import logging
-from typing import Tuple, Union
+from typing import Tuple
 
 from src.config.instance import YOUTUBE_UPLOAD_DIR
 from src.utils.exceptions import YouTubeDownloadError
