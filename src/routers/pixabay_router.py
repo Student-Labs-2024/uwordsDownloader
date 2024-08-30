@@ -5,7 +5,11 @@ from fastapi.responses import FileResponse
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status
 
 from src.utils.headers import check_secret_token
-from src.utils.exceptions import PixabaySearchError, PixabayDownloadError
+from src.utils.exceptions import (
+    PixabayAPIKeyError,
+    PixabaySearchError,
+    PixabayDownloadError,
+)
 
 from src.services.pixabay_service import download_pixabay_image
 
@@ -35,13 +39,22 @@ async def download_image(
 
         return FileResponse(path=file_path, media_type="image/jpeg", filename=filename)
 
+    except PixabayAPIKeyError as e:
+        logger.error(f"[DOWNLOAD] Error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"msg": str(e)},
+        )
+
     except PixabaySearchError as e:
+        logger.error(f"[DOWNLOAD] Error: {e}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"msg": str(e)},
         )
 
     except PixabayDownloadError as e:
+        logger.error(f"[DOWNLOAD] Error: {e}")
         raise HTTPException(
             status_code=status.HTTP_424_FAILED_DEPENDENCY,
             detail={"msg": str(e)},
