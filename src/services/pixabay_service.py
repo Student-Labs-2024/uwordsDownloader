@@ -1,6 +1,7 @@
 import logging
 import aiohttp
 import aiofiles
+import traceback
 from time import time
 from PIL import Image
 from typing import Dict, Tuple
@@ -55,7 +56,7 @@ async def search_image(word: str) -> str:
         key = await get_available_key()
 
     except PixabayAPIKeyError as e:
-        logger.error(f"[SEARCH] Error: {e}")
+        logger.error(f"[SEARCH] Error: {e}\n{traceback.format_exc()}")
         raise PixabaySearchError("Failed to find active API key!")
 
     async with aiohttp.ClientSession() as session:
@@ -80,7 +81,7 @@ async def search_image(word: str) -> str:
                     return None
 
         except Exception as e:
-            logger.error(f"[SEARCH] Error: {e}")
+            logger.error(f"[SEARCH] Error: {e}\n{traceback.format_exc()}")
             raise PixabaySearchError(f"Failed to search for image!")
 
 
@@ -112,5 +113,5 @@ async def download_pixabay_image(
                     raise PixabayDownloadError(f"Failed to download image!")
 
         except Exception as e:
-            logger.info(f"[DOWNLOAD] Error: {e}")
+            logger.info(f"[DOWNLOAD] Error: {e}\n{traceback.format_exc()}")
             raise PixabayDownloadError(f"Failed to download image!")
