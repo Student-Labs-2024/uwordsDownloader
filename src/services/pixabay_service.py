@@ -6,7 +6,11 @@ from PIL import Image
 from typing import Dict, Tuple
 from collections import defaultdict
 
-from src.utils.exceptions import PixabaySearchError, PixabayDownloadError
+from src.utils.exceptions import (
+    PixabayAPIKeyError,
+    PixabaySearchError,
+    PixabayDownloadError,
+)
 from src.config.instance import (
     API_KEYS,
     IMAGE_UPLOAD_DIR,
@@ -27,11 +31,11 @@ logger = logging.getLogger("SERVICES PIXABAY")
 KEY_USAGE: Dict[str, Tuple[int, float]] = defaultdict(lambda: (0, time()))
 
 
-def get_available_key() -> str:
+async def get_available_key() -> str:
     current_time = time()
 
     for key in API_KEYS:
-        usage_count, last_reset_time = KEY_USAGE[key]
+        usage_count, last_reset_time = KEY_USAGE.get(key, (0, current_time))
 
         if current_time - last_reset_time > 60:
             KEY_USAGE[key] = (0, current_time)
@@ -41,13 +45,18 @@ def get_available_key() -> str:
             KEY_USAGE[key] = (usage_count + 1, last_reset_time)
             return key
 
-    raise PixabaySearchError(
+    raise PixabayAPIKeyError(
         "All API keys have reached their request limits. Please wait."
     )
 
 
 async def search_image(word: str) -> str:
-    key = get_available_key()
+    try:
+        key = await get_available_key()
+
+    except PixabayAPIKeyError as e:
+        logger.error(f"[SEARCH] Error: {e}")
+        raise PixabaySearchError("Failed to find active API key!")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -67,7 +76,7 @@ async def search_image(word: str) -> str:
                     return image.get("largeImageURL")
 
                 else:
-                    logger.info(response.text())
+                    logger.error(f"[SEARCH] Error: {response.text()}")
                     return None
 
         except Exception as e:
@@ -79,6 +88,9 @@ async def download_pixabay_image(
     word: str,
 ) -> Tuple[str, str]:
     image_url = await search_image(word=word)
+
+    if not image_url:
+        raise PixabayDownloadError(f"No image URL returned for word: {word}")
 
     async with aiohttp.ClientSession() as session:
         try:
